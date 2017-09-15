@@ -1,18 +1,20 @@
 import React from 'react';
 
-const notes = [
-    {
-        id: '4e81fc6e-bfb6-419b-93e5-0242fb6f3f6a',
-        task: 'Learn React'
-    },
-    {
-        id: '11bbffc8-5891-4b45-b9ea-5c99aadf870f',
-        task: 'Do laundry'
-    }
-];
+import Note from './Note';
+import Editable from './Editable';
 
-export default () => (
-    <ul>{notes.map(note =>
-        <li key={note.id}>{note.task}</li>
-    )}</ul>
+
+export default ({notes, onNoteClick=() => {}, onEdit=() => {}, onDelete=() => {}}) => (
+  <ul className="notes">{notes.map(({id, editing, task}) =>
+      <li key={id}>
+          <Note className="note" onClick={onNoteClick.bind(null, id)}>
+              <Editable className="editable"
+                        editing={editing}
+                        value={task}
+                        onEdit={onEdit.bind(null, id)} />
+              <button className="delete"
+                      onClick={onDelete.bind(null, id)}>x</button>
+          </Note>
+      </li>
+  )}</ul>
 )
