@@ -1,94 +1,27 @@
 import React from 'react';
 import uuid from 'uuid';
+import connect from '../libs/connect';
+import Lanes from './Lanes';
+import LaneActions from '../actions/LaneActions';
 
-import Notes from './Notes';
-
-
-export default class App extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            notes: [
-                {
-                    id: uuid.v4(),
-                    task: 'Learn React'
-                },
-                {
-                    id: uuid.v4(),
-                    task: 'Do laundry'
-                }
-            ]
-        };
-    }
-
-    render() {
-        const {notes} = this.state;
-
-        return  (
-            <div>
-                <button className="add-note" onClick={this.addNote}>+</button>
-                <Notes notes={notes}
-                       onNoteClick={this.activateNoteEdit}
-                       onEdit={this.editNote}
-                       onDelete={this.deleteNote}/>
-            </div>
-        );
-    }
-
-    addNote = () => {
-        // It would be possible to write this in an imperative style.
-        // I.e., through `this.state.notes.push` and then
-        // `this.setState({notes: this.state.notes})` to commit.
-        //
-        // I tend to favor functional style whenever that makes sense.
-        // Even though it might take more code sometimes, I feel
-        // the benefits (easy to reason about, no side effects)
-        // more than make up for it.
-        //
-        // Libraries, such as Immutable.js, go a notch further.
-        this.setState({
-            notes: [
-                ...this.state.notes,
-                {
-                    id: uuid.v4(),
-                    task: 'New task'
-                }
-            ]
+const App = ({LaneActions, lanes}) => {
+    const addLane = () => {
+        LaneActions.create({
+            id: uuid.v4(),
+            name: 'New lane'
         });
-    }
+    };
 
-    activateNoteEdit = (id) => {
-        this.setState({
-            notes: this.state.notes.map(note => {
-                if(note.id === id) {
-                    note.editing = true;
-                }
+    return (
+        <div>
+        <button className="add-lane" onClick={addLane}>+</button>
+        <Lanes lanes={lanes} />
+        </div>
+    );
+};
 
-                return note;
-            })
-        });
-    }
-
-    editNote = (id, task) => {
-        this.setState({
-            notes: this.state.notes.map(note => {
-                if(note.id === id) {
-                    note.editing = false;
-                    note.task = task;
-                }
-
-                return note;
-            })
-        });
-    }
-
-    deleteNote = (id, e) => {
-        // Avoid bubbling to edit
-        e.stopPropagation();
-
-        this.setState({
-        notes: this.state.notes.filter(note => note.id !== id)
-        });
-    }
-}
+export default connect(({lanes}) => ({
+    lanes
+}), {
+    LaneActions
+})(App)
